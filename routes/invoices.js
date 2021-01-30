@@ -4,11 +4,13 @@ const ExpressError = require("../expressError");
 const express = require('express');
 const router = express.Router()
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (_req, res, next) => {
     try {
         const results = await db.query(
             `SELECT * FROM invoices`);
-        return res.json(results.rows);
+        return res.json({
+            'invoices': results.rows
+        });
     } catch (e) {
         return next(e);
     }
@@ -20,10 +22,12 @@ router.get('/:id', async (req, res, next) => {
             `SELECT * FROM invoices
             WHERE id = $1`,
             [req.params.id]);
-        if (results.rows.length == 0){
+        if (results.rows.length == 0) {
             throw new ExpressError(`Invoice id ${req.params.id} not found`, 404);
         }
-        return res.json(results.rows[0]);
+        return res.json({
+            'invoice': results.rows[0]
+        });
     } catch (e) {
         return next(e);
     }
@@ -82,7 +86,7 @@ router.delete('/:id', async (req, res, next) => {
         if (results.rows.length === 0) {
             throw new ExpressError('Company Not Found', 404);
         }
-        
+
         return res.json({
             'message': 'deleted'
         });
