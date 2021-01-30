@@ -55,20 +55,29 @@ router.post('/', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
     try {
         const {
-            amt
+            amt,
+            paid
         } = req.body;
+
+        let date = ''
+        if (paid === "true"){
+            date = `, paid_date=CURRENT_DATE`
+        }else{
+            date = `, paid_date=NULL`
+        }
+
         const results = await db.query(
-            `UPDATE invoices SET amt=$1
-            WHERE id = $2
+            `UPDATE invoices SET amt=$1, paid=$2 ${date}
+            WHERE id = $3
             RETURNING *`,
-            [amt, req.params.id]);
+            [amt, paid, req.params.id]);
 
         if (results.rows.length === 0) {
-            throw new ExpressError('Company Not Found', 404);
+            throw new ExpressError('Invoice Not Found', 404);
         }
 
         return res.json({
-            'company': results.rows[0]
+            'invoice': results.rows[0]
         });
     } catch (e) {
         return next(e);
