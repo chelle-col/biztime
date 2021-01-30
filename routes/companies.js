@@ -27,7 +27,7 @@ router.post('/', async (req, res, next) => {
             [code, name, desc]);
 
         return res.json({
-            'company': results.rows
+            'company': results.rows[0]
         });
     } catch (e) {
         return next(e);
@@ -53,7 +53,7 @@ router.get('/:code', async (req, res, next) => {
 
         return res.json({
             'company': 
-                company.rows,
+                company.rows[0],
             'invoices': invoices.rows
         });
     } catch (e) {
@@ -79,7 +79,7 @@ router.put('/:code', async (req, res, next) => {
         }
 
         return res.json({
-            'company': results.rows
+            'company': results.rows[0]
         });
     } catch (e) {
         return next(e);

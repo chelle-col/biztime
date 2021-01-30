@@ -14,6 +14,21 @@ router.get('/', async (req, res, next) => {
     }
 })
 
+router.get('/:id', async (req, res, next) => {
+    try {
+        const results = await db.query(
+            `SELECT * FROM invoices
+            WHERE id = $1`,
+            [req.params.id]);
+        if (results.rows.length == 0){
+            throw new ExpressError(`Invoice id ${req.params.id} not found`, 404);
+        }
+        return res.json(results.rows[0]);
+    } catch (e) {
+        return next(e);
+    }
+})
+
 router.post('/', async (req, res, next) => {
     try {
         const {
@@ -26,7 +41,7 @@ router.post('/', async (req, res, next) => {
             [comp_code, amt]);
 
         return res.json({
-            'invoice': results.rows
+            'invoice': results.rows[0]
         });
     } catch (e) {
         return next(e);
@@ -49,7 +64,7 @@ router.put('/:id', async (req, res, next) => {
         }
 
         return res.json({
-            'company': results.rows
+            'company': results.rows[0]
         });
     } catch (e) {
         return next(e);
